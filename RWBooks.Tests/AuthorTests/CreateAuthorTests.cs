@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using RWBooks.App.Models;
 using RWBooks.DataAccess.Context;
 using RWBooks.DataAccess.Entities;
 using RWBooks.Domain.Models;
@@ -24,9 +25,8 @@ namespace RWBooks.Tests.AuthorTests
         public async Task Create_WithValidAuthorInfo_ReturnsOkResultAndAddsAuthorToDatabase()
         {
             // Arrange
-            var authorInfo = new AuthorInfo
+            var authorCreateViewModel = new AuthorCreateViewModel
             {
-                Id = Guid.NewGuid(),
                 Name = "John Doe"
             };
 
@@ -36,16 +36,17 @@ namespace RWBooks.Tests.AuthorTests
             var client = _factory.CreateClient();
 
             // Act
-            var response = await client.PostAsJsonAsync("authors/create", authorInfo);
+            var response = await client.PostAsJsonAsync("authors/create", authorCreateViewModel);
 
             // Assert
             response.EnsureSuccessStatusCode();
-                      
-            var addedAuthor = await dbContext.Authors.FindAsync(authorInfo.Id);
-
-            Assert.NotNull(addedAuthor);
 
             var apiResponse = await response.Content.ReadFromJsonAsync<Author>();
+            Assert.NotNull(apiResponse);
+
+            var addedAuthor = await dbContext.Authors.FindAsync(apiResponse.Id);
+            Assert.NotNull(addedAuthor);
+            
             Assert.NotNull(apiResponse);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }

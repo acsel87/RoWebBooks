@@ -1,10 +1,10 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using RWBooks.App.Extensions;
 using RWBooks.App.Models;
 using RWBooks.DataAccess.Entities;
 using RWBooks.DataAccess.Repositories;
 using RWBooks.Domain.Models;
-using RWBooks.Service.Extensions;
 using RWBooks.Service.Services;
 
 namespace RWBooks.App.Controllers.V1
@@ -35,9 +35,9 @@ namespace RWBooks.App.Controllers.V1
 
         [HttpPost("Create")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(Author))]
-        public async Task<IActionResult> Create(AuthorInfo authorInfo)
+        public async Task<IActionResult> Create(AuthorCreateViewModel authorCreateViewModel)
         {
-            var author = authorInfo.ToAuthor();
+            var author = authorCreateViewModel.ToAuthor();
 
             await _unitOfWork.Authors.Add(author);
             var result = await _unitOfWork.Commit();
